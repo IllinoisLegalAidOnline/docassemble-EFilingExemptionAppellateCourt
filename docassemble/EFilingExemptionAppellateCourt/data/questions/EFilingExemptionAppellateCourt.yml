@@ -9,6 +9,9 @@ include:
   - docassemble.ILAO:ilao-interview-framework.yml
   - docassemble.ILAO:shared-basic-questions.yml
 ---
+modules:
+  - .DefendantList
+---
 objects:
   - users: ALPeopleList.using(there_are_any=True)
   - judge: ALIndividual
@@ -67,24 +70,7 @@ code: |
   if include_email_address == True:
     users[0].email
   set_progress(100)
-  if user_is_appealing == True:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = True
-    else:
-      plaintiff_appellant = False
-  else:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = False
-    else:
-      plaintiff_appellant = True
-  if plaintiff_appellant == True:
-    defendant_appellant = False
-    defendant_appellee = True
-    plaintiff_appellee = False
-  else:
-    defendant_appellant = True
-    defendant_appellee = False
-    plaintiff_appellee = True
+  plaintiff_appellant
   get_docs_screen
 ---
 id: welcome
@@ -93,7 +79,7 @@ question: |
 subquestion: |
   Welcome to Illinois Legal Aid Online's **E-filing exemption - Appellate Court** Easy Form.
 
-  This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper court forms in the Appellate Court.
+  This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the Appellate Court.
   
   Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
 field: sees_nav_bar
@@ -107,7 +93,7 @@ subquestion: |
   
   To use this program, you will need to know:
 
-  * Information about your trial court case, such as party names and filing county,
+  * Information about your circuit court case, such as party names and filing county,
   * Information about your appellate case, such as party names and filing district, and
   * Reasons why you are not able to e-file.
   
@@ -179,7 +165,7 @@ question: |
   % if i == 0:
   What is your name?
   % else:
-  What is the name of the ${ ordinal(i) } person who is part of the trial court case with you?
+  What is the name of the ${ ordinal(i) } person who is part of the circuit court case with you?
   % endif
 subquestion: |
   % if i != 0:
@@ -338,7 +324,7 @@ fields:
 ---
 id: trial party label
 question: |
-  In the trial court case, what was your party label?
+  In the **[circuit court]** case, what was your party label?
 subquestion: |
   ${ collapse_template(which_party) }  
 field: trial_party_label
@@ -347,6 +333,11 @@ choices:
   - Petitioner: petitioner
   - Defendant: defendant
   - Respondent: respondent
+terms:
+  phrases:
+      - 'circuit court'
+  definition: |
+    The circuit court is the first court to hear a case. It is also called a trial court.
 ---
 template: which_party
 subject: |
@@ -360,7 +351,7 @@ content: |
 ---
 id: any other users
 question: |
-  Is anyone else on your side of the trial court case?
+  Is anyone else on your side of the circuit court case?
 subquestion: |
   % if len(users.elements) > 1:  
   So far you have told us about ${comma_and_list(users.complete_elements().full_names())}.
@@ -369,7 +360,6 @@ fields:
   - "Anyone else?": users.there_is_another
     datatype: yesnoradio
 ---
-id: opposing party code
 code: |
   if trial_party_label == 'plaintiff':
     opposing_label = 'defendant'
@@ -382,7 +372,7 @@ code: |
 ---
 id: any other party
 question: |
-  Are there ${ opposing_label }s in the trial court case?
+  Are there ${ opposing_label }s in the circuit court case?
 subquestion: |
   Certain kinds of cases do not have an opposing party, such as a Name Change or an Expungement case.
 fields:
@@ -402,7 +392,7 @@ fields:
 ---
 id: any more other parties
 question: |
-  Are there any other ${ opposing_label }s in the trial court case?
+  Are there any other ${ opposing_label }s in the circuit court case?
 subquestion: |  
   So far you have told us about ${comma_and_list(other_parties.complete_elements().full_names())}.
 fields:
@@ -412,9 +402,9 @@ fields:
 id: county
 continue button field: county
 question: |
-  In which county was the trial court case filed?
+  In which county was the circuit court case filed?
 subquestion: |
-  If this is a new case, select the name of the county where the case will be filed.
+  The county should listed near the top of the circuit court papers.
     
   ${ collapse_template(county_lookup_help) }  
 fields:
@@ -447,20 +437,20 @@ content: |
 ---
 id: case number
 question: |
-  What is the trial court case number?
+  What is the circuit court case number?
 subquestion: |
-  The **{appellate clerk}** gives each case a number when it is filed.
+  The **{circuit clerk}** gives each case a number when it is filed.
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
-  - Case number: trial_case_number
+  - Circuit case number: trial_case_number
 terms:
-  appellate clerk: |
-    The office that takes care of files and documents for appellate court cases.
+  circuit clerk: |
+    The office that takes care of files and documents for circuit court cases.
 ---
-id: trial court judge name
+id: circuit court judge name
 question: |
-  What is the name of the trial court judge who issued the order being appealed?
+  Who is the circuit court judge who issued the order being appealed?
 fields:
   - First: judge.name.first
   - Middle: judge.name.middle
@@ -469,44 +459,27 @@ fields:
 ---
 id: in re check
 question: |
-  Does the caption in the trial court case say "**In Re**" in addition to listing the parties?
+ Does the trial court case have the words "**In re:**" in the name?
 subquestion: |
-  Look at the caption at the top of the trial court document. "In Re" is often used in probate, bankruptcy, and certain family law cases. For example, a probate case regarding Jane Doe's estate might say "In Re: Estate of Jane Doe."
+  Look at the name of the case at the top of the trial court papers. “In re” is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In Re: Estate of Jane Doe.”
 fields:
   - no label: in_re_check
     datatype: yesnoradio
 ---
 id: in re label
 question: |
-  What does it say after "**In Re**" on the trial court document?
+  What does it say after "**In Re:**" on the circuit court papers?
 fields:
   - In re: in_re_label
 ---
 id: appeal filer
 question: |
-  Are you filing the appeal of the trial court judgment?
+  Are you filing the appeal of the circuit court judgment?
 subquestion: |
   ${ collapse_template(appeal_who) }  
 fields:
   - no label: user_is_appealing
-    datatype: yesnoradio  
----
-code: |
-  if user_is_appealing == True:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = True
-    else:
-      plaintiff_appellant = False
-  else:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = False
-    else:
-      plaintiff_appellant = True
-  if plaintiff_appellant == True:
-    defendant_appellant = False
-  else:
-    defendant_appellant = True
-  
+    datatype: yesnoradio    
 ---
 id: appellate district
 question: |
@@ -542,16 +515,16 @@ question: |
 subquestion: |
   If this is a new appeal, or if you do not know the case number, you can leave this question blank.
 fields:
-  - Case number: appellate_case_number
+  - Appellate case number: appellate_case_number
     required: False
 ---
 template: appeal_who
 subject: |
   **How do I know who is filing the appeal?**
 content: |  
-  If the trial court ruled against you and you want the Appellate Court to review the trial court decision, you are filing the appeal.
+  If the circuit court ruled against you and you want the Appellate Court to review the circuit court decision, you are filing the appeal.
 
-  If the trial court ruled against the other side and they want the Appellate Court to review the trial court decision, they are filing the appeal.
+  If the circuit court ruled against the other side and they want the Appellate Court to review the circuit court decision, they are filing the appeal.
 ---
 template: district_help
 subject: |
@@ -560,6 +533,29 @@ content: |
   If the case was already filed in the appellate court, the appellate district should be listed near the top of the appellate court forms.
 
   If you are starting a new appeal, look at this [map of Illinois Judicial Districts](https://www.illinoiscourts.gov/courts/appellate-court/) to find the appellate district where you should file.
+---
+depends on:
+  - user_is_appealing
+  - trial_party_label
+code: |
+  if user_is_appealing == True:
+    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+      plaintiff_appellant = True
+    else:
+      plaintiff_appellant = False
+  else:
+    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+      plaintiff_appellant = False
+    else:
+      plaintiff_appellant = True
+  if plaintiff_appellant == True:
+    defendant_appellant = False
+    defendant_appellee = True
+    plaintiff_appellee = False
+  else:
+    defendant_appellant = True
+    defendant_appellee = False
+    plaintiff_appellee = True
 ---
 id: get docs screen
 event: get_docs_screen
@@ -613,9 +609,6 @@ objects:
   - al_user_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
 ---
-modules:
-  - .DefendantList
----
 attachment:
   - name: E-filing exemption
     variable name: efiling_exemption[i]
@@ -666,23 +659,23 @@ subquestion: |
 review: 
   - Edit: trial_party_label
     button: |
-      **Your role in the trial court case:**
+      **Your role in the circuit court case:**
       ${trial_party_label}
   - Edit: users.revisit
     button: |
-      **Your party: (Edit to change names)**
+      **Your party:**
 
       % for my_var in users:
         * ${ my_var.name.full(middle="full") }
       % endfor
   - Edit: anyone_opposing
     button: |
-      **Is there an opposing party in the trial court case?**
+      **Is there an opposing party in the circuit court case?**
       ${word(yesno(anyone_opposing))}
     show if: plaintiff_or_petitioner
   - Edit: other_parties.revisit
     button: |
-      **The other party: (Edit to change names)**
+      **The other party:**
 
       % for my_var in other_parties:
         * ${ my_var.name.full(middle="full") }
@@ -691,27 +684,23 @@ review:
   - Edit: trial_case_number
     button: |
       **Trial case number:** ${ trial_case_number }
-  - Edit: appellate_case_number
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - trial_court
     button: |
-      **Appellate case number:** ${ appellate_case_number }
+      **Which county was the circuit court case in?:** ${ trial_court.address.county }
   - Edit: judge.name.first
     button: |
       **Trial court judge:** ${ judge.name.full(middle='full')}
   - Edit: in_re_check
     button: |
-      **Does trial court case's caption say "In Re?"**  
+      **Does circuit court case's caption say "In Re?"**  
       ${word(yesno(in_re_check))}
   - Edit: in_re_label
     button: |
       **In Re:** ${in_re_label}
     show if: in_re_check
-  - Edit: user_is_appealing
-    button: |
-      **Are you filing the appeal?**
-      ${ word(yesno(user_is_appealing))}
-  - Edit: appellate_district
-    button: |
-      **Appellate Court district:** ${appellate_district}
   - Edit: minor_involved
     button: |
       **Is a minor involved in this case?**
@@ -728,7 +717,7 @@ review:
   - Edit: other_reasons
     button: |
       % if other_reasons.all_false() == False:
-        **You are applying for an efiling exemption because:**
+        **You are applying for an e-filing exemption because:**
         
       % if other_reasons.all_true('no_computer') == True:
         * You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.
@@ -744,14 +733,18 @@ review:
       % endif
       % endif
       % if other_reasons.all_false() == True:
-        **Do you have any other reasons for requesting an efiling exemption?** No
+        **Do you have any other reasons for requesting an e-filing exemption?** No
       % endif
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - trial_court
+  - Edit: appellate_case_number
     button: |
-      **Which county was the trial court case in?:** ${ trial_court.address.county }
+      **Appellate case number:** ${ appellate_case_number }
+  - Edit: user_is_appealing
+    button: |
+      **Are you filing the appeal?**
+      ${ word(yesno(user_is_appealing))}
+  - Edit: appellate_district
+    button: |
+      **Appellate Court district:** ${appellate_district}
   - Edit: users[0].name.first
     button: |
       **Your name:** ${ users[0].name.full(middle="full") }

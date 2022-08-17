@@ -1,8 +1,8 @@
-def list_defendants(users, parties, opposing, label):
-  if label == "defendant" or label == "respondent":
+def list_defendants(users, other_parties, any_opposing, user_party_label):
+  if user_party_label == "defendant" or user_party_label == "respondent":
     return users
   else:
-    if opposing == True:
-      return parties
+    if any_opposing == True:
+      return other_parties
     else:
       return ""
