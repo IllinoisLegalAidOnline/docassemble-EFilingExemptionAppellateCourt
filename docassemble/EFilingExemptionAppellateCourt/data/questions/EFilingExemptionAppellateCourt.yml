@@ -1,16 +1,13 @@
 metadata:
-  title: E-filing exemption - Appellate Court
+  title: E-filing exemption - Appellate court
   short title: Appellate e-filing exemption
-  comment: This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper court forms in the Appellate Court.
+  comment: This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper court forms in the appellate court.
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.ALToolbox:phone-number-validation.yml
   - docassemble.ILAO:ilao-interview-framework.yml
   - docassemble.ILAO:shared-basic-questions.yml
----
-modules:
-  - .DefendantList
 ---
 objects:
   - users: ALPeopleList.using(there_are_any=True)
@@ -59,9 +56,9 @@ code: |
   judge.name.first
   if in_re_check == True:
     in_re_label
+  minor_involved
   user_is_appealing
   appellate_district
-  minor_involved
   appellate_case_number
   set_progress(80)
   users[0].address.address
@@ -75,11 +72,11 @@ code: |
 ---
 id: welcome
 question: |
-  E-filing exemption - Appellate Court
+  E-filing exemption - Appellate court
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **E-filing exemption - Appellate Court** Easy Form.
+  Welcome to Illinois Legal Aid Online's **E-filing exemption - Appellate court** Easy Form.
 
-  This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the Appellate Court.
+  This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
   
   Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
 field: sees_nav_bar
@@ -89,7 +86,7 @@ continue button field: how_to_use
 question: |
   Instructions
 subquestion: |
-  You can use this form if you are filing court forms in Appellate Court and want to request an e-filing exemption.
+  You can use this form if you are filing court forms in appellate court and want to request an e-filing exemption.
   
   To use this program, you will need to know:
 
@@ -324,8 +321,10 @@ fields:
 ---
 id: trial party label
 question: |
-  In the **[circuit court]** case, what was your party label?
+  In the circuit court case, what was your party label?
 subquestion: |
+  The circuit court is the court where a case is started. It is also called a trial court.
+  
   ${ collapse_template(which_party) }  
 field: trial_party_label
 choices:
@@ -333,11 +332,6 @@ choices:
   - Petitioner: petitioner
   - Defendant: defendant
   - Respondent: respondent
-terms:
-  phrases:
-      - 'circuit court'
-  definition: |
-    The circuit court is the first court to hear a case. It is also called a trial court.
 ---
 template: which_party
 subject: |
@@ -443,7 +437,7 @@ subquestion: |
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
-  - Circuit case number: trial_case_number
+  - Circuit court case number: trial_case_number
 terms:
   circuit clerk: |
     The office that takes care of files and documents for circuit court cases.
@@ -459,18 +453,18 @@ fields:
 ---
 id: in re check
 question: |
- Does the trial court case have the words "**In re:**" in the name?
+ Does the circuit court case have the words "**In re:**" in the name?
 subquestion: |
-  Look at the name of the case at the top of the trial court papers. “In re” is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In Re: Estate of Jane Doe.”
+  Look at the name of the case at the top of the circuit court papers. “In re” is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In re: Estate of Jane Doe.”
 fields:
   - no label: in_re_check
     datatype: yesnoradio
 ---
 id: in re label
 question: |
-  What does it say after "**In Re:**" on the circuit court papers?
+  What does it say after "**In re:**" on the circuit court papers?
 fields:
-  - In re: in_re_label
+  - In re:: in_re_label
 ---
 id: appeal filer
 question: |
@@ -515,16 +509,16 @@ question: |
 subquestion: |
   If this is a new appeal, or if you do not know the case number, you can leave this question blank.
 fields:
-  - Appellate case number: appellate_case_number
+  - Appellate court case number: appellate_case_number
     required: False
 ---
 template: appeal_who
 subject: |
   **How do I know who is filing the appeal?**
 content: |  
-  If the circuit court ruled against you and you want the Appellate Court to review the circuit court decision, you are filing the appeal.
+  If the circuit court ruled against you and you want the appellate aourt to review the circuit court decision, you are filing the appeal.
 
-  If the circuit court ruled against the other side and they want the Appellate Court to review the circuit court decision, they are filing the appeal.
+  If the circuit court ruled against the other side and they want the appellate court to review the circuit court decision, they are filing the appeal.
 ---
 template: district_help
 subject: |
@@ -587,7 +581,6 @@ under: |
  
   ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
 ---
-id: which of two
 code: |
   if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
     plaintiff_or_petitioner = True
@@ -597,7 +590,7 @@ code: |
 generic object: ALDocumentBundle
 template: x.send_email_template
 subject: |
-  E-filing Exemption - Appellate Court
+  E-filing exemption - Appellate court
 content: |
   Your forms are attached.
   
@@ -683,7 +676,7 @@ review:
     show if: anyone_opposing
   - Edit: trial_case_number
     button: |
-      **Trial case number:** ${ trial_case_number }
+      **Circuit court case number:** ${ trial_case_number }
   - Edit: 
       - trial_court_index
       - recompute:
@@ -692,14 +685,14 @@ review:
       **Which county was the circuit court case in?:** ${ trial_court.address.county }
   - Edit: judge.name.first
     button: |
-      **Trial court judge:** ${ judge.name.full(middle='full')}
+      **Circuit court judge:** ${ judge.name.full(middle='full')}
   - Edit: in_re_check
     button: |
-      **Does circuit court case's caption say "In Re?"**  
+      **Does circuit court case's caption say "In re:?"**  
       ${word(yesno(in_re_check))}
   - Edit: in_re_label
     button: |
-      **In Re:** ${in_re_label}
+      **In re:** ${in_re_label}
     show if: in_re_check
   - Edit: minor_involved
     button: |
@@ -737,14 +730,14 @@ review:
       % endif
   - Edit: appellate_case_number
     button: |
-      **Appellate case number:** ${ appellate_case_number }
+      **Appellate court case number:** ${ appellate_case_number }
   - Edit: user_is_appealing
     button: |
       **Are you filing the appeal?**
       ${ word(yesno(user_is_appealing))}
   - Edit: appellate_district
     button: |
-      **Appellate Court district:** ${appellate_district}
+      **Appellate court district:** ${appellate_district}
   - Edit: users[0].name.first
     button: |
       **Your name:** ${ users[0].name.full(middle="full") }
@@ -778,6 +771,8 @@ rows: users
 columns:
   - Name: |
       row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+edit:
+  - name.first
 delete buttons: True
 confirm: True
 ---
@@ -794,6 +789,8 @@ rows: other_parties
 columns:
   - Name: |
       row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+edit:
+  - name.first
 delete buttons: True
 confirm: True
 ---
