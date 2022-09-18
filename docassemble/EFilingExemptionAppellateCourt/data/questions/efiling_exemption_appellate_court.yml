@@ -1,7 +1,7 @@
 metadata:
   title: E-filing exemption - Appellate court
   short title: Appellate e-filing exemption
-  comment: This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper court forms in the appellate court.
+  comment: This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
@@ -414,7 +414,7 @@ continue button field: county
 question: |
   In which county was the circuit court case filed?
 subquestion: |
-  The county should listed near the top of the circuit court papers.
+  The county should be listed near the top of the circuit court papers.
     
   ${ collapse_template(county_lookup_help) }  
 fields:
@@ -449,7 +449,7 @@ id: case number
 question: |
   What is the circuit court case number?
 subquestion: |
-  The **{circuit clerk}** gives each case a number when it is filed.
+  The **{circuit clerk}** of ${ trial_court.address.county.upper() } County gives each case a number when it is filed.
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
