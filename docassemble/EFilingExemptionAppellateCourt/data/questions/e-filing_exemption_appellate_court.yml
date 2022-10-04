@@ -1,0 +1,955 @@
+metadata:
+  title: E-filing exemption - Appellate court
+  short title: Appellate e-filing exemption
+  comment: This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALToolbox:phone-number-validation.yml
+  - docassemble.ILAO:ilao-interview-framework.yml
+  - docassemble.ILAO:shared-basic-questions.yml
+---
+objects:
+  - users: ALPeopleList.using(there_are_any=True)
+  - judge: ALIndividual
+  - other_parties: ALPeopleList.using(there_are_any=True)
+  - court_list: ALCourtLoader.using(file_name='docassemble.ILAO:data/sources/il_courts.xlsx')
+---
+sections:
+  - review_answers: Review your answers
+---
+# Road map
+sections:
+  - section_intro: Start
+  - section_reasons: Reasons for exemption
+  - section_circuit: Circuit Court case
+  - section_appellate: Appellate Court case
+  - section_user: About you
+  - section_download: Download
+#  - review_answers: Review your answers
+---
+# interview order block
+mandatory: True
+code: |
+  ilao_easy_form_title = "E-filing exemption"
+  ilao_easy_form_url = "https://www.illinoislegalaid.org/legal-information/e-filing-exemption-appellate-court"
+  nav.set_section('section_intro')
+  sees_nav_bar
+  set_progress(5)
+  how_to_use
+  accept_terms
+  how_to_qualify
+  nav.set_section('section_reasons')
+  if disability == True:
+    disability_exit
+  set_progress(20)
+  if other_exemptions.any_true() == True:
+    exemptions_exit
+  if sensitive_case == False:
+    if have_lawyer == True:
+      do_not_qualify
+    else:
+      if other_reasons.all_false() == True: 
+        do_not_qualify
+  if sensitive_case == True:
+    other_reasons
+  set_progress(40)
+  nav.set_section('section_circuit')
+  trial_party_label
+  users.gather()
+  set_progress(60)
+  if plaintiff_or_petitioner == True:
+    if anyone_opposing == True:
+      other_parties.gather()
+  else:
+    other_parties.gather()
+  trial_court
+  trial_case_number
+  judge.name.first
+  if in_re_check == True:
+    in_re_label
+  nav.set_section('section_appellate')
+  minor_involved
+  user_is_appealing
+  appellate_district
+  appellate_case_number
+  set_progress(80)
+  nav.set_section('section_user')
+  users[0].address.address
+  if include_phone == True:
+    users[0].phone_number
+  if include_email_address == True:
+    users[0].email
+  set_progress(100)
+  #plaintiff_appellant
+  nav.set_section('section_download')
+  get_docs_screen
+---
+id: welcome
+question: |
+  E-filing exemption - Appellate court
+subquestion: |
+  Welcome to Illinois Legal Aid Online's **E-filing exemption - Appellate court** Easy Form.
+
+  This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
+  
+  Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
+field: sees_nav_bar
+---
+id: instructions
+continue button field: how_to_use
+question: |
+  Instructions
+subquestion: |
+  You can use this form if you are filing court forms in appellate court and want to request an e-filing exemption.
+  
+  To use this program, you will need to know:
+
+  * Information about your circuit court case, such as party names and filing county,
+  * Information about your appellate court case, such as party names and filing district, and
+  * Reasons why you are not able to e-file.
+  
+  Set aside 5 minutes to finish this program. You can log in and save your work to return to later. 
+    
+  After you download your form, you will need to deliver it to the courthouse.
+  
+  ${ collapse_template(help_example) }  
+
+  Click on **{green words}** to learn what they mean. Some questions have a question mark in a circle ${ fa_icon("question-circle", color_css="#0DCAF0" ) } that also gives help. 
+---
+template: help_example
+
+subject: |
+
+  **You can expand sections like this to show more information.**
+
+content: |  
+
+  This is an example of help. Click again to hide.
+---
+id: accept terms
+question: |
+  Terms of use
+subquestion: |
+  This program does not provide legal advice. It does not take the place of advice from a lawyer.
+
+  Using this program does not create an attorney-client relationship between you and Illinois Legal Aid Online or its employees.
+
+  ${ collapse_template(get_legal_help) }  
+
+fields:
+  - To continue, you must accept the [**terms of use**](https://www.illinoislegalaid.org/about/terms-of-use).: accept
+    datatype: checkboxes
+    none of the above: False
+    minlength: 1
+    choices:
+      - I accept the terms of use.
+    validation messages:
+      minlength: |
+        You cannot continue unless you agree to the terms of use.
+continue button field: accept_terms
+---
+template: get_legal_help
+subject: |
+  **What if I need legal advice?**
+content: |  
+  If you have questions or concerns about your legal problem and want legal advice you should talk to a lawyer.
+ 
+  Use [**Get Legal Help**](https://www.illinoislegalaid.org/get-legal-help) to find free or low-cost legal services in your area.
+---
+id: qualifications
+continue button field: how_to_qualify
+question: |
+  Qualifying for an e-filing exemption
+subquestion: |
+  You may qualify for an e-filing exemption if you are filing court forms in a sensitive case, such as a petition for an Order of Protection, a Civil No Contact Order, or a Stalking No Contact Order.
+
+  You may also qualify if you do not have a lawyer and at least one of the following statements is true:
+
+  * You do not have the Internet or computer access in the home and travel presents a hardship (financial or otherwise),
+  * You have trouble reading, writing, or speaking in English, or
+  * You tried to e-file your papers, but you were not able to complete the process because the equipment or help you need was not available.
+---
+sets:
+  - users[i].name.first
+id: users names
+question: |
+  % if i == 0:
+  What is your name?
+  % else:
+  What is the name of the ${ ordinal(i) } person who is part of the circuit court case with you?
+  % endif
+subquestion: |
+  % if i != 0:
+  ${ collapse_template(long_name_help) }
+  % endif
+fields:
+  - code: |
+        users[i].name_fields(person_or_business='unsure')
+---
+template: long_name_help
+subject: |
+  **What if the person's name doesn't fit into 4 fields?**
+content: |
+  If the party has a long name like "Jane Smith, Director of Housing," select **Business or organization**. You can then enter the full name and title.
+---
+id: your address
+question: |
+  What is your address?
+fields:
+  - Street address: users[0].address.address
+    address autocomplete: True
+  - Address line 2: users[0].address.unit
+    required: False
+  - City: users[0].address.city
+  - State: users[0].address.state
+    code: |
+      states_list() 
+  - ZIP code: users[0].address.zip
+---
+id: include phone
+question: |
+  Do you want to include your phone number on the form?
+fields:
+  - no label: include_phone
+    datatype: yesnoradio
+---
+id: your phone
+question: |
+  What is your phone number?
+fields:
+  - Phone number: users[0].phone_number
+    datatype: al_international_phone
+---
+id: include email
+question: |
+  Do you want to include your email address on the form?
+fields:
+  - no label: include_email_address
+    datatype: yesnoradio
+---
+id: your email
+question: |
+  What is your email address?
+fields: 
+  - Email: users[0].email
+    datatype: email
+---
+id: disability question
+question: |
+  Do you have a disability that prevents you from e-filing?
+subquestion: |
+  ${ collapse_template(help_disability) }  
+fields:
+  - no label: disability
+    datatype: yesnoradio
+---
+template: help_disability
+
+subject: |
+
+  **What qualifies as a disability?**
+
+content: |  
+
+  A disability is a physical or mental impairment that substantially limits one or more major life activity.
+---
+id: disability exit
+event: disability_exit
+question: |
+  Sorry
+subquestion: |
+  If you have a disability that prevents you from e-filing, you have an automatic exemption. You do not need to use this program to make an exemption form.
+
+  The **{appellate court clerk}** should accommodate your request to file by paper. They should not ask you to explain or prove your disability.
+buttons:
+  - Exit: exit
+  - Restart: restart
+terms:
+  appellate court clerk: |
+    The office that takes care of files and documents for appellate court cases.
+---
+id: other exemptions
+question: |
+  Are you in one of these situations?
+fields:
+  - no label: other_exemptions
+    datatype: checkboxes
+    choices:
+      - "You are filing a will."
+      - "You are filing into a juvenile case."
+      - "You are in jail or prison."
+---
+id: exemptions exit
+event: exemptions_exit
+question: |
+  Sorry
+subquestion: |
+  You are not required to e-file in your situation. The **{appellate court clerk}** should accommodate your request to file by paper.
+buttons:
+  - Exit: exit
+  - Restart: restart
+terms:
+  appellate court clerk: |
+    The office that takes care of files and documents for appellate court cases.
+---
+id: sensitive case
+question: |
+  Are you going to file forms into a sensitive case?
+subquestion: |
+   For example, a petition for an Order of Protection, a Civil No Contact Order, or a Stalking No Contact Order are all sensitive cases.
+fields:
+  - no label: sensitive_case
+    datatype: yesnoradio
+---
+id: representation
+question: |
+  Are you represented by a lawyer in this case?
+fields:
+  - no label: have_lawyer
+    datatype: yesnoradio
+---
+id: do not qualify
+event: do_not_qualify
+question: |
+  Sorry
+subquestion: |
+  You do not qualify for an e-filing exemption.
+  
+  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory) or you can call or text [**Illinois Court Help**](https://www.ilcourthelp.gov) at 833-411-1121.
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: other reasons
+question: |
+  Are you in any of these situations?
+subquestion: |
+  Select all that apply.
+fields:
+  - no label: other_reasons
+    datatype: checkboxes
+    choices:
+      - "You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.": no_computer
+      - "You have trouble reading, writing, or speaking in English.": no_english
+      - "You tried to e-file your papers, but you were unable to complete the process because the equipment or help you need is not available.": unable_to
+---
+id: trial party label
+question: |
+  In the circuit court case, what was your party label?
+subquestion: |
+  The circuit court is the court where a case is started. It is also called a trial court.
+  
+  ${ collapse_template(which_party) }  
+field: trial_party_label
+choices:
+  - Plaintiff: plaintiff
+  - Petitioner: petitioner
+  - Defendant: defendant
+  - Respondent: respondent
+---
+template: which_party
+subject: |
+  **How do I figure out my party label?**
+content: |
+  If you are filing a new case, you are either the Plaintiff or the Petitioner.
+
+  If someone filed this case against you, you are either the Defendant or the Respondent.
+
+  The other court forms in the case should help you figure it out. Look at the top (the caption) of the Complaint or Petition. That form should have a label by your name.
+---
+id: any other users
+question: |
+  Is anyone else on your side of the circuit court case?
+subquestion: |
+  % if len(users.elements) > 1:  
+  So far you have told us about ${comma_and_list(users.complete_elements().full_names())}.
+  % endif  
+fields:
+  - "Anyone else?": users.there_is_another
+    datatype: yesnoradio
+---
+code: |
+  if trial_party_label == 'plaintiff':
+    opposing_label = 'defendant'
+  if trial_party_label == 'defendant':
+    opposing_label = 'plaintiff'
+  if trial_party_label == 'petitioner':
+    opposing_label = 'respondent'
+  if trial_party_label == 'respondent':
+    opposing_label = 'petitioner'
+---
+id: any other party
+question: |
+  Are there ${ opposing_label }s in the circuit court case?
+subquestion: |
+  Certain kinds of cases do not have an opposing party, such as a Name Change or an Expungement case.
+fields:
+  - no label: anyone_opposing
+    datatype: yesnoradio
+---
+sets:
+  - other_parties[i].name.first
+id: other party name
+question: |
+  What is the name of the ${ ordinal(i) } ${ opposing_label }?
+subquestion: |
+  ${ collapse_template(long_name_help) }
+fields:
+  - code: |
+      other_parties[i].name_fields(person_or_business='unsure')
+---
+id: any more other parties
+question: |
+  Are there any other ${ opposing_label }s in the circuit court case?
+subquestion: |  
+  So far you have told us about ${comma_and_list(other_parties.complete_elements().full_names())}.
+fields:
+  - "Anyone else?": other_parties.there_is_another
+    datatype: yesnoradio
+---
+id: county
+continue button field: county
+question: |
+  In which county was the circuit court case filed?
+subquestion: |
+  The county should be listed near the top of the circuit court papers.
+fields:
+  - no label: trial_court_index
+    code: |
+      court_county_lookup()
+---
+code: |
+  def court_county_lookup():
+    all_court_counties = court_list._load_courts()['address_county'].items()
+    filtered_courts = [(-1, "Cook")]
+    for court in all_court_counties:
+      if court[1] != "Cook":
+        filtered_courts.append(court)
+    return sorted( filtered_courts, key=lambda y: y[1])
+---
+depends on:
+  - trial_court_index
+code: |
+  if trial_court_index == "-1":
+    trial_court = court_list.as_court('trial_court', 15)
+  else:
+    trial_court = court_list.as_court('trial_court', trial_court_index)
+---
+template: county_lookup_help
+subject: |
+  **How do I look up the county?**
+content: |  
+  You can use this [**City-to-County Finder**](https://www.statsamerica.org/CityCountyFinder/) to find the county.
+---
+id: case number
+question: |
+  What is the circuit court case number?
+subquestion: |
+  The **{circuit court clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
+
+  The case number is in the caption near the top of the first page of the court forms.
+fields:
+  - Circuit court case number: trial_case_number
+terms:
+  circuit court clerk: |
+    The office that takes care of files and documents for circuit court cases.
+---
+id: circuit court judge name
+question: |
+  Who is the circuit court judge who issued the order being appealed?
+fields:
+  - First: judge.name.first
+  - Middle: judge.name.middle
+    required: False
+  - Last: judge.name.last
+---
+id: in re check
+question: |
+ Does the circuit court case have the words "**In re:**" in the name?
+subquestion: |
+  Look at the name of the case at the top of the circuit court papers. “In re” is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In re: Estate of Jane Doe.”
+fields:
+  - no label: in_re_check
+    datatype: yesnoradio
+---
+id: in re label
+question: |
+  What does it say after "**In re:**" on the circuit court papers?
+fields:
+  - In re:: in_re_label
+---
+id: appeal filer
+question: |
+  Who is appealing the Circuit Court decision?
+subquestion: |
+  ${ collapse_template(appeal_who) }  
+field: user_is_appealing
+buttons:
+  - "My party ( ${comma_and_list(users)})": True
+  - "The other party (${comma_and_list(other_parties)})": False
+---
+id: appellate district
+question: |
+  In which appellate district will the appeal be filed?
+subquestion: |
+  If it was already filed, select the appellate district where the appeal was filed.
+  
+  ${ collapse_template(district_help) } 
+field: appellate_district
+choices:
+  - First
+  - Second
+  - Third
+  - Fourth
+  - Fifth
+---
+id: minor involved
+question: |
+  Does the appeal involve any of the following issues?
+subquestion: |
+  * Child custody
+  * Allocation of parental responsibilities
+  * Adoption
+  * Termination of parental rights
+  * Any other matter affecting the best interest of a child
+fields:
+  - no label: minor_involved
+    datatype: yesnoradio
+---
+id: appellate case number
+question: |
+  What is the appellate court case number?
+subquestion: |
+  If this is a new appeal, or if you do not know the case number, you can leave this question blank.
+fields:
+  - Appellate court case number: appellate_case_number
+    required: False
+---
+template: appeal_who
+subject: |
+  **How do I know who is filing the appeal?**
+content: |  
+  If the circuit court ruled against you and you want the appellate aourt to review the circuit court decision, you are filing the appeal.
+
+  If the circuit court ruled against the other side and they want the appellate court to review the circuit court decision, they are filing the appeal.
+---
+template: district_help
+subject: |
+  **What if I don't know the right appellate district?**
+content: |  
+  If the case was already filed in the appellate court, the appellate district should be listed near the top of the appellate court forms.
+
+  If you are starting a new appeal, look at this [map of Illinois Judicial Districts](https://www.illinoiscourts.gov/courts/appellate-court/) to find the appellate district where you should file.
+---
+depends on:
+  - user_is_appealing
+  - trial_party_label
+code: |
+  if user_is_appealing == True:
+    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+      plaintiff_appellant = True
+    else:
+      plaintiff_appellant = False
+  else:
+    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+      plaintiff_appellant = False
+    else:
+      plaintiff_appellant = True
+  if plaintiff_appellant == True:
+    defendant_appellant = False
+    defendant_appellee = True
+    plaintiff_appellee = False
+  else:
+    defendant_appellant = True
+    defendant_appellee = False
+    plaintiff_appellee = True
+---
+id: get docs screen
+event: get_docs_screen
+question: |
+  Download
+subquestion: |
+  Your form is ready. View and download your form below. Click **Make changes** to fix any mistakes.
+  
+  Read the instructions to learn what to do next.
+
+  Thank you for using ILAO Easy Forms!
+  
+  ${ action_button_html(url_action('review_answers'), label=':edit: Make changes', color='success', size="md") }
+
+  ${ al_user_bundle.download_list_html() }
+ 
+  &nbsp;
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+  
+  **Note:** This program does not send your form. You will need to do this yourself.
+
+  Thank you for using ILAO Easy Forms!
+under: |
+  % if not user_logged_in():
+  [${fa_icon("sign-in-alt", color="#0079d0", size="sm")} **Sign-in**](${url_of('login', next=interview_url())}) or [**create**](${url_of('register', next=interview_url())}) an ILAO Easy Form account to save your progress (optional).
+  % endif
+
+ 
+  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
+---
+depends on:
+  - trial_party_label
+code: |
+  if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+    plaintiff_or_petitioner = True
+  if trial_party_label == "defendant" or trial_party_label == "respondent":
+    plaintiff_or_petitioner = False
+    anyone_opposing = True
+---
+generic object: ALDocumentBundle
+template: x.send_email_template
+subject: |
+  E-filing exemption - Appellate court
+content: |
+  Your forms are attached.
+  
+  Thanks for using ILAO Easy Forms!
+  
+  [**Illinois Legal Aid Online**](https://www.illinoislegalaid.org)
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
+---
+attachment:
+  - name: E-filing exemption
+    variable name: efiling_exemption[i]
+    filename: e_filing_exemption
+    pdf template file: e_filing_exemption_appellate.pdf
+    skip undefined: True
+    editable: False
+    fields:
+      - "court_county": ${ trial_court.address.county.upper() }
+      - "plaintiff_list": ${ users.full_names() if trial_party_label == "plaintiff" or trial_party_label == "petitioner" else other_parties.full_names()}
+      - "defendant_list": ${list_defendants(users.full_names(), other_parties.full_names(), anyone_opposing, trial_party_label)}
+      - "trial_case_number": ${ trial_case_number }
+      - "appellate_case_number": ${ appellate_case_number }
+      - "no_computer": ${ other_reasons.all_true('no_computer') }
+      - "no_english": ${ other_reasons.all_true('no_english') }
+      - "sensitive_case": ${ sensitive_case }
+      - "unable_to": ${ other_reasons.all_true('unable_to') }
+      - "user_address_one": ${ users[0].address.line_one(bare=True) }
+      - "user_address_two": ${ users[0].address.line_two() }
+      - "user_name": ${ users[0].name.full(middle="full") }
+      - "user_email": ${ users[0].email if include_email_address == True else "" }
+      - "user_phone": ${ phone_number_formatted(users[0].phone_number) if include_phone == True else ""}
+      - "appellant_plaintiff": ${plaintiff_appellant}
+      - "appellee_plaintiff": ${ plaintiff_appellee}
+      - "appellant_defendant": ${ defendant_appellant}
+      - "appellee_defendant": ${ defendant_appellee}
+      - "judge_name": ${judge.name.full(middle='full')}
+      - "in_re": ${ in_re_label if in_re_check == True else ""}
+      - "minor_involved": ${minor_involved}
+      - "appellate_district": ${appellate_district}
+---
+attachment:
+  - name: instructions
+    variable name: instructions[i]
+    filename: efiling_exemption_instructions
+    docx template file: efiling_exemption_appellate_instructions.docx
+---
+objects:
+  - efiling_exemption: ALDocument.using(title="E-filing exemption", filename="exemption", enabled=True, has_addendum=False)
+  - instructions: ALDocument.using(title="Instructions", filename="instructions", enabled=True, has_addendum=False)
+---
+id: review screen
+event: review_answers
+question: |
+  Review screen
+subquestion: |
+  Edit your answers below.
+review: 
+  - Edit: trial_party_label
+    button: |
+      **Your role in the circuit court case:**
+      ${trial_party_label}
+  - Edit: users.revisit
+    button: |
+      **Your party:**
+
+      % for my_var in users:
+        * ${ my_var.name.full(middle="full") }
+      % endfor
+  - Edit: anyone_opposing
+    button: |
+      **Is there an opposing party in the circuit court case?**
+      ${word(yesno(anyone_opposing))}
+    show if: plaintiff_or_petitioner
+  - Edit: other_parties.revisit
+    button: |
+      **The other party:**
+
+      % for my_var in other_parties:
+        * ${ my_var.name.full(middle="full") }
+      % endfor
+    show if: anyone_opposing
+  - Edit: trial_case_number
+    button: |
+      **Circuit court case number:** ${ trial_case_number }
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - trial_court
+    button: |
+      **Which county was the circuit court case in?:** ${ trial_court.address.county }
+  - Edit: judge.name.first
+    button: |
+      **Circuit court judge:** ${ judge.name.full(middle='full')}
+  - Edit: in_re_check
+    button: |
+      **Does circuit court case's caption say "In re:?"**  
+      ${word(yesno(in_re_check))}
+  - Edit: in_re_label
+    button: |
+      **In re:** ${in_re_label}
+    show if: in_re_check
+  - Edit: minor_involved
+    button: |
+      **Is a minor involved in this case?**
+      ${word(yesno(minor_involved))}
+  - Edit: sensitive_case
+    button: |
+      **Is this a sensitive case?**
+      ${ word(yesno(sensitive_case)) }
+  - Edit: have_lawyer
+    button: |
+      **Are you represented by a lawyer in this case?**
+      ${ word(yesno(have_lawyer))}
+    show if: sensitive_case == False
+  - Edit: other_reasons
+    button: |
+      % if other_reasons.all_false() == False:
+        **You are applying for an e-filing exemption because:**
+        
+      % if other_reasons.all_true('no_computer') == True:
+        * You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.
+        
+      % endif
+      % if other_reasons.all_true('no_english') == True:
+        * You have trouble reading, writing, or speaking in English.
+        
+      % endif
+      % if other_reasons.all_true('unable_to') == True:
+        * You tried to e-file your papers, but you were unable to complete the process because the equipment or help you need is not available.
+        
+      % endif
+      % endif
+      % if other_reasons.all_false() == True:
+        **Do you have any other reasons for requesting an e-filing exemption?** No
+      % endif
+  - Edit: appellate_case_number
+    button: |
+      **Appellate court case number:** ${ appellate_case_number }
+  - Edit: user_is_appealing
+    button: |
+      **Is your party filing the appeal?**
+      ${ word(yesno(user_is_appealing))}
+  - Edit: appellate_district
+    button: |
+      **Appellate court district:** ${appellate_district}
+  - Edit: include_phone
+    button: |
+      **Do you want to include your phone number?**
+      ${ word(yesno(include_phone)) }
+  - Edit: users[0].phone_number
+    button: |
+      **Your phone number:** ${ phone_number_formatted(users[0].phone_number) }
+    show if: include_phone
+  - Edit: include_email_address
+    button: |
+      **Do you want to include your email address?**
+      ${ word(yesno(include_email_address)) }
+  - Edit: users[0].email
+    button: |
+      **Your email:** ${ users[0].email }
+    show if: include_email_address
+---
+id: user party table
+continue button field: users.revisit
+question: |
+  % if users.number_gathered() > 1:
+  Edit your party's names
+  % else:
+  Edit your party's name
+  % endif
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+edit:
+  - name.first
+delete buttons: True
+confirm: True
+---
+id: opposing party table
+continue button field: other_parties.revisit
+question: |
+  % if other_parties.number_gathered() > 1:
+  Edit the other party's names
+  % else:
+  Edit the other party's name
+  % endif
+subquestion: |
+  ${ other_parties.table }
+
+  ${ other_parties.add_action() }
+---
+table: other_parties.table
+rows: other_parties
+columns:
+  - Name: |
+      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+edit:
+  - name.first
+delete buttons: True
+confirm: True
+---
+id: section_reasons
+event: section_reasons
+question: |
+  Reasons for exemption
+subquestion: |
+  Edit your answers below.
+review:
+  - Edit: sensitive_case
+    button: |
+      **Is this a sensitive case?**
+      ${ word(yesno(sensitive_case)) }
+  - Edit: have_lawyer
+    button: |
+      **Are you represented by a lawyer in this case?**
+      ${ word(yesno(have_lawyer))}
+    show if: sensitive_case == False
+  - Edit: other_reasons
+    button: |
+      % if other_reasons.all_false() == False:
+        **You are applying for an e-filing exemption because:**
+        
+      % if other_reasons.all_true('no_computer') == True:
+        * You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.
+        
+      % endif
+      % if other_reasons.all_true('no_english') == True:
+        * You have trouble reading, writing, or speaking in English.
+        
+      % endif
+      % if other_reasons.all_true('unable_to') == True:
+        * You tried to e-file your papers, but you were unable to complete the process because the equipment or help you need is not available.
+        
+      % endif
+      % endif
+      % if other_reasons.all_false() == True:
+        **Do you have any other reasons for requesting an e-filing exemption?** No
+      % endif
+---
+id: section_circuit
+event: section_circuit
+question: |
+  Circuit Court case
+subquestion: |
+  Edit your answers below.
+review:
+  - Edit: trial_party_label
+    button: |
+      **Your role in the circuit court case:**
+      ${trial_party_label}
+  - Edit: users.revisit
+    button: |
+      **Your party:**
+
+      % for my_var in users:
+        * ${ my_var.name.full(middle="full") }
+      % endfor
+  - Edit: anyone_opposing
+    button: |
+      **Is there an opposing party in the circuit court case?**
+      ${word(yesno(anyone_opposing))}
+    show if: plaintiff_or_petitioner
+  - Edit: other_parties.revisit
+    button: |
+      **The other party:**
+
+      % for my_var in other_parties:
+        * ${ my_var.name.full(middle="full") }
+      % endfor
+    show if: anyone_opposing
+  - Edit: trial_case_number
+    button: |
+      **Circuit court case number:** ${ trial_case_number }
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - trial_court
+    button: |
+      **Which county was the circuit court case in?:** ${ trial_court.address.county }
+  - Edit: judge.name.first
+    button: |
+      **Circuit court judge:** ${ judge.name.full(middle='full')}
+  - Edit: in_re_check
+    button: |
+      **Does circuit court case's caption say "In re:?"**  
+      ${word(yesno(in_re_check))}
+  - Edit: in_re_label
+    button: |
+      **In re:** ${in_re_label}
+    show if: in_re_check
+---
+id: section_appellate
+event: section_appellate
+question: |
+  Appellate Court case
+subquestion: |
+  Edit your answers below.
+review:
+  - Edit: minor_involved
+    button: |
+      **Is a minor involved in this case?**
+      ${word(yesno(minor_involved))}
+  - Edit: appellate_case_number
+    button: |
+      **Appellate court case number:** ${ appellate_case_number }
+  - Edit: user_is_appealing
+    button: |
+      **Is your party filing the appeal?**
+      ${ word(yesno(user_is_appealing))}
+  - Edit: appellate_district
+    button: |
+      **Appellate court district:** ${appellate_district}
+---
+id: section_user
+event: section_user
+question: |
+  About you
+subquestion: |
+  Edit your answers below. If you want to edit your name, you should go to the Circuit Court case review section and edit the parties.
+review:
+  - Edit: include_phone
+    button: |
+      **Do you want to include your phone number?**
+      ${ word(yesno(include_phone)) }
+  - Edit: users[0].phone_number
+    button: |
+      **Your phone number:** ${ phone_number_formatted(users[0].phone_number) }
+    show if: include_phone
+  - Edit: include_email_address
+    button: |
+      **Do you want to include your email address?**
+      ${ word(yesno(include_email_address)) }
+  - Edit: users[0].email
+    button: |
+      **Your email:** ${ users[0].email }
+    show if: include_email_address
