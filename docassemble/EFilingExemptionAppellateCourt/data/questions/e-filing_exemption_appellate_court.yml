@@ -15,6 +15,12 @@ objects:
   - other_parties: ALPeopleList.using(there_are_any=True)
   - court_list: ALCourtLoader.using(file_name='docassemble.ILAO:data/sources/il_courts.xlsx')
 ---
+code: |
+  ilao_easy_form_title = "E-filing exemption - Appellate Court"
+  ilao_easy_form_url = "https://www.illinoislegalaid.org/legal-information/e-filing-exemption-appellate-court"
+  github_user = 'IllinoisLegalAidOnline'
+  github_repo_name = 'docassemble-EFilingExemptionAppellateCourt'
+---
 sections:
   - review_answers: Review your answers
 ---
@@ -31,8 +37,6 @@ sections:
 # interview order block
 mandatory: True
 code: |
-  ilao_easy_form_title = "E-filing exemption"
-  ilao_easy_form_url = "https://www.illinoislegalaid.org/legal-information/e-filing-exemption-appellate-court"
   nav.set_section('section_intro')
   sees_nav_bar
   set_progress(5)
@@ -177,7 +181,7 @@ question: |
   % if i == 0:
   What is your name?
   % else:
-  What is the name of the ${ ordinal(i) } person who is part of the circuit court case with you?
+  What is the name of the ${ ordinal(i) } ${ trial_party_label} in the circuit court case?
   % endif
 subquestion: |
   % if i != 0:
@@ -392,7 +396,7 @@ sets:
   - other_parties[i].name.first
 id: other party name
 question: |
-  What is the name of the ${ ordinal(i) } ${ opposing_label }?
+  What is the name of the ${ ordinal(i) } ${ opposing_label } in the circuit court case?
 subquestion: |
   ${ collapse_template(long_name_help) }
 fields:
@@ -485,7 +489,7 @@ question: |
 subquestion: |
   ${ collapse_template(appeal_who) }  
 field: user_is_appealing
-buttons:
+choices:
   - "My party ( ${comma_and_list(users)})": True
   - "The other party (${comma_and_list(other_parties)})": False
 ---
@@ -937,6 +941,9 @@ question: |
 subquestion: |
   Edit your answers below. If you want to edit your name, you should go to the Circuit Court case review section and edit the parties.
 review:
+  - Edit: users[0].name.first
+    button: |
+      **Your name:** ${ users[0].name.full(middle='full') }
   - Edit: include_phone
     button: |
       **Do you want to include your phone number?**
