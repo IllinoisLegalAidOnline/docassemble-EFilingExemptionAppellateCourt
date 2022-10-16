@@ -356,9 +356,9 @@ template: which_party
 subject: |
   **How do I figure out my party label?**
 content: |
-  If you are filing a new case, you are either the Plaintiff or the Petitioner.
+  If you filed the circuit court case, you are either the Plaintiff or the Petitioner.
 
-  If someone filed this case against you, you are either the Defendant or the Respondent.
+  If someone filed the circuit court case against you, you are either the Defendant or the Respondent.
 
   The other court forms in the case should help you figure it out. Look at the top (the caption) of the Complaint or Petition. That form should have a label by your name.
 ---
@@ -450,13 +450,13 @@ id: case number
 question: |
   What is the circuit court case number?
 subquestion: |
-  The **{circuit court clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
+  The **{circuit clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
   - Circuit court case number: trial_case_number
 terms:
-  circuit court clerk: |
+  circuit clerk: |
     The office that takes care of files and documents for circuit court cases.
 ---
 id: circuit court judge name
@@ -577,8 +577,6 @@ subquestion: |
   Your form is ready. View and download your form below. Click **Make changes** to fix any mistakes.
   
   Read the instructions to learn what to do next.
-
-  Thank you for using ILAO Easy Forms!
   
   ${ action_button_html(url_action('review_answers'), label=':edit: Make changes', color='success', size="md") }
 
@@ -939,7 +937,7 @@ event: section_user
 question: |
   About you
 subquestion: |
-  Edit your answers below. If you want to edit your name, you should go to the Circuit Court case review section and edit the parties.
+  Edit your answers below.
 review:
   - Edit: users[0].name.first
     button: |
