@@ -21,9 +21,6 @@ code: |
   github_user = 'IllinoisLegalAidOnline'
   github_repo_name = 'docassemble-EFilingExemptionAppellateCourt'
 ---
-sections:
-  - review_answers: Review your answers
----
 # Road map
 sections:
   - section_intro: Start
@@ -32,7 +29,6 @@ sections:
   - section_appellate: Appellate Court case
   - section_user: About you
   - section_download: Download
-#  - review_answers: Review your answers
 ---
 # interview order block
 mandatory: True
