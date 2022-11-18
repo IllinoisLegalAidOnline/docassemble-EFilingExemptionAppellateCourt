@@ -65,12 +65,13 @@ code: |
     other_parties.gather()
   trial_court
   trial_case_number
-  judge.name.first
+  judge.name.last
   if in_re_check == True:
     in_re_label
   nav.set_section('section_appellate')
   minor_involved
-  user_is_appealing
+  if anyone_opposing == True:
+    user_is_appealing
   appellate_district
   appellate_case_number
   set_progress(80)
@@ -81,8 +82,8 @@ code: |
   if include_email_address == True:
     users[0].email
   set_progress(100)
-  #plaintiff_appellant
   nav.set_section('section_download')
+  plaintiff_appellant
   get_docs_screen
 ---
 id: welcome
@@ -92,6 +93,8 @@ subquestion: |
   Welcome to Illinois Legal Aid Online's **E-filing exemption - Appellate court** Easy Form.
 
   This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
+  
+  If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court** Easy Form](https://www.illinoislegalaid.org/legal-information/e-filing-exemption-supreme-court).
   
   Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
 field: sees_nav_bar
@@ -265,9 +268,6 @@ subquestion: |
 buttons:
   - Exit: exit
   - Restart: restart
-terms:
-  appellate court clerk: |
-    The office that takes care of files and documents for appellate court cases.
 ---
 id: other exemptions
 question: |
@@ -289,9 +289,6 @@ subquestion: |
 buttons:
   - Exit: exit
   - Restart: restart
-terms:
-  appellate court clerk: |
-    The office that takes care of files and documents for appellate court cases.
 ---
 id: sensitive case
 question: |
@@ -446,20 +443,22 @@ id: case number
 question: |
   What is the circuit court case number?
 subquestion: |
-  The **{circuit clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
+  The **{circuit court clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
   - Circuit court case number: trial_case_number
-terms:
-  circuit clerk: |
-    The office that takes care of files and documents for circuit court cases.
 ---
 id: circuit court judge name
 question: |
   Who is the circuit court judge who issued the order being appealed?
+subquestion: |
+  The judge's name is listed on the court order that is being appealed. You can also call the **{circuit court clerk}** to ask for the judge's name.
+  
+  You do not need to enter the judge's full name. You are only required to enter the judge's last name.
 fields:
   - First: judge.name.first
+    required: False
   - Middle: judge.name.middle
     required: False
   - Last: judge.name.last
@@ -542,28 +541,36 @@ content: |
 
   If you are starting a new appeal, look at this [map of Illinois Judicial Districts](https://www.illinoiscourts.gov/courts/appellate-court/) to find the appellate district where you should file.
 ---
+mandatory: True
 depends on:
   - user_is_appealing
   - trial_party_label
+  - anyone_opposing
 code: |
-  if user_is_appealing == True:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = True
+  if anyone_opposing == True:
+    if user_is_appealing == True:
+      if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+        plaintiff_appellant = True
+      else:
+        plaintiff_appellant = False
     else:
-      plaintiff_appellant = False
+      if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
+        plaintiff_appellant = False
+      else:
+        plaintiff_appellant = True
+    if plaintiff_appellant == True:
+      defendant_appellant = False
+      defendant_appellee = True
+      plaintiff_appellee = False
+    else:
+      defendant_appellant = True
+      defendant_appellee = False
+      plaintiff_appellee = True
   else:
-    if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
-      plaintiff_appellant = False
-    else:
-      plaintiff_appellant = True
-  if plaintiff_appellant == True:
-    defendant_appellant = False
-    defendant_appellee = True
+    plaintiff_appellant = True
     plaintiff_appellee = False
-  else:
-    defendant_appellant = True
     defendant_appellee = False
-    plaintiff_appellee = True
+    defendant_appellant = False
 ---
 id: get docs screen
 event: get_docs_screen
@@ -698,7 +705,7 @@ review:
         - trial_court
     button: |
       **Which county was the circuit court case in?:** ${ trial_court.address.county }
-  - Edit: judge.name.first
+  - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name.full(middle='full')}
   - Edit: in_re_check
@@ -750,6 +757,7 @@ review:
     button: |
       **Is your party filing the appeal?**
       ${ word(yesno(user_is_appealing))}
+    show if: anyone_opposing
   - Edit: appellate_district
     button: |
       **Appellate court district:** ${appellate_district}
@@ -894,7 +902,7 @@ review:
         - trial_court
     button: |
       **Which county was the circuit court case in?:** ${ trial_court.address.county }
-  - Edit: judge.name.first
+  - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name.full(middle='full')}
   - Edit: in_re_check
@@ -924,6 +932,7 @@ review:
     button: |
       **Is your party filing the appeal?**
       ${ word(yesno(user_is_appealing))}
+    show if: anyone_opposing
   - Edit: appellate_district
     button: |
       **Appellate court district:** ${appellate_district}
