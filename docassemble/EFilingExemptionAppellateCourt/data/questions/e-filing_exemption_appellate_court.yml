@@ -94,7 +94,7 @@ subquestion: |
 
   This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
   
-  If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court** Easy Form](https://www.illinoislegalaid.org/legal-information/e-filing-exemption-supreme-court).
+  If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court**](https://www.illinoislegalaid.org/legal-information/e-filing-exemption-supreme-court) Easy Form.
   
   Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
 field: sees_nav_bar
@@ -226,14 +226,18 @@ fields:
 ---
 id: include email
 question: |
-  Do you want to include your email address on the form?
+  Do you have an email address?
+subquestion: |
+  If you have an email address, you must list it so the court and other parties can contact you about this case.
 fields:
   - no label: include_email_address
     datatype: yesnoradio
 ---
 id: your email
 question: |
-  What is your email address?
+  What email address do you want to list on your form?
+subquestion: |
+  If you do not want to enter your personal email address, you can create a new email account to get email about your case.
 fields: 
   - Email: users[0].email
     datatype: email
@@ -276,9 +280,9 @@ fields:
   - no label: other_exemptions
     datatype: checkboxes
     choices:
-      - "You are filing a will."
-      - "You are filing into a juvenile case."
-      - "You are in jail or prison."
+      - "I am filing a will."
+      - "I am filing into a juvenile case."
+      - "I am in jail or prison."
 ---
 id: exemptions exit
 event: exemptions_exit
@@ -327,9 +331,9 @@ fields:
   - no label: other_reasons
     datatype: checkboxes
     choices:
-      - "You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.": no_computer
-      - "You have trouble reading, writing, or speaking in English.": no_english
-      - "You tried to e-file your papers, but you were unable to complete the process because the equipment or help you need is not available.": unable_to
+      - "I do not have a computer or Internet access in my home. My only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.": no_computer
+      - "I have trouble reading, writing, or speaking in English.": no_english
+      - "I tried to e-file my papers, but I was unable to complete the process because the equipment or help I need is not available.": unable_to
 ---
 id: trial party label
 question: |
@@ -539,7 +543,7 @@ subject: |
 content: |  
   If the case was already filed in the appellate court, the appellate district should be listed near the top of the appellate court forms.
 
-  If you are starting a new appeal, look at this [map of Illinois Judicial Districts](https://www.illinoiscourts.gov/courts/appellate-court/) to find the appellate district where you should file.
+  If you are starting a new appeal, look at this [**map of Illinois Judicial Districts**](https://www.illinoiscourts.gov/courts/appellate-court/) to find the appellate district where you should file.
 ---
 mandatory: True
 depends on:
