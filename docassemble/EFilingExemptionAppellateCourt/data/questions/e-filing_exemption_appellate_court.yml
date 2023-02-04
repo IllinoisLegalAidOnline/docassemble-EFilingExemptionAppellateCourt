@@ -259,12 +259,12 @@ subject: |
 
 content: |  
 
-  A disability is a physical or mental impairment that substantially limits one or more major life activity.
+  A disability is a physical or mental impairment that substantially limits one or more major life activities.
 ---
 id: disability exit
 event: disability_exit
 question: |
-  Sorry
+  No need to request an exemption
 subquestion: |
   If you have a disability that prevents you from e-filing, you have an automatic exemption. You do not need to use this program to make an exemption form.
 
@@ -287,7 +287,7 @@ fields:
 id: exemptions exit
 event: exemptions_exit
 question: |
-  Sorry
+  No need to request an exemption
 subquestion: |
   You are not required to e-file in your situation. The **{appellate court clerk}** should accommodate your request to file by paper.
 buttons:
@@ -765,6 +765,10 @@ review:
   - Edit: appellate_district
     button: |
       **Appellate court district:** ${appellate_district}
+  - Edit: users[0].address.address
+    button: |
+      **Your address:**
+      ${users[0].address.on_one_line()}
   - Edit: include_phone
     button: |
       **Do you want to include your phone number?**
@@ -951,6 +955,10 @@ review:
   - Edit: users[0].name.first
     button: |
       **Your name:** ${ users[0].name.full(middle='full') }
+  - Edit: users[0].address.address
+    button: |
+      **Your address:**
+      ${users[0].address.on_one_line()}
   - Edit: include_phone
     button: |
       **Do you want to include your phone number?**
