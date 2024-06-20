@@ -35,6 +35,7 @@ mandatory: True
 code: |
   nav.set_section('section_intro')
   sees_nav_bar
+  snapshot_start
   set_progress(5)
   how_to_use
   accept_terms
@@ -84,7 +85,36 @@ code: |
   set_progress(100)
   nav.set_section('section_download')
   plaintiff_appellant
+  forms_assembling
+  snapshot_forms
   get_docs_screen
+---
+code: |
+  stuff_to_snapshot = {
+  	'start_time': str(current_datetime().format_datetime()),
+  	'started_interview': True, 
+  	}
+    
+  stuff_to_snapshot['user_zip'] = showifdef('users[0].address.zip')
+
+  stuff_to_snapshot['downloaded_forms'] = showifdef('forms_assembling')
+  
+  stuff_to_snapshot['trial_party_label'] = showifdef('trial_party_label') 
+  
+  stuff_to_snapshot['plaintiff_appellant'] = showifdef('plaintiff_appellant') 
+  
+  store_variables_snapshot(
+  	data=stuff_to_snapshot, persistent=True
+  	)
+  snapshot_interview_state = True
+---
+code: |
+  snapshot_interview_state
+  snapshot_start = True  
+---
+code: |
+  reconsider('snapshot_interview_state')
+  snapshot_forms = True
 ---
 id: welcome
 question: |
@@ -576,6 +606,17 @@ code: |
     defendant_appellee = False
     defendant_appellant = False
 ---
+id: forms assembling
+continue button field: forms_assembling
+question: |
+  Almost done
+subquestion: |
+  After you click **Next**, it may take a few moments to finish making your forms.
+  
+  ###### You do not need to refresh your screen. Hang in there!
+  
+  [NEWLINE]
+---
 id: get docs screen
 event: get_docs_screen
 question: |
@@ -786,7 +827,7 @@ review:
       **Your email:** ${ users[0].email }
     show if: include_email_address
 ---
-id: user party table
+id: user parties review screen
 continue button field: users.revisit
 question: |
   % if users.number_gathered() > 1:
@@ -809,7 +850,7 @@ edit:
 delete buttons: True
 confirm: True
 ---
-id: opposing party table
+id: opposing parties review screen
 continue button field: other_parties.revisit
 question: |
   % if other_parties.number_gathered() > 1:
@@ -832,7 +873,7 @@ edit:
 delete buttons: True
 confirm: True
 ---
-id: section_reasons
+id: reasons review screen
 event: section_reasons
 question: |
   Reasons for exemption
@@ -870,7 +911,7 @@ review:
         **Do you have any other reasons for requesting an e-filing exemption?** No
       % endif
 ---
-id: section_circuit
+id: circuit case review screen
 event: section_circuit
 question: |
   Circuit Court case
@@ -922,7 +963,7 @@ review:
       **In re:** ${in_re_label}
     show if: in_re_check
 ---
-id: section_appellate
+id: appellate case review screen
 event: section_appellate
 question: |
   Appellate Court case
@@ -945,7 +986,7 @@ review:
     button: |
       **Appellate court district:** ${appellate_district}
 ---
-id: section_user
+id: user review section
 event: section_user
 question: |
   About you
