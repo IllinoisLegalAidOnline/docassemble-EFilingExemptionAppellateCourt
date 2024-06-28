@@ -94,7 +94,12 @@ code: |
   	'start_time': str(current_datetime().format_datetime()),
   	'started_interview': True, 
   	}
-    
+  
+  try:
+    stuff_to_snapshot['ip_address'] = device(ip=True)
+  except:
+    pass
+  
   stuff_to_snapshot['user_zip'] = showifdef('users[0].address.zip')
 
   stuff_to_snapshot['downloaded_forms'] = showifdef('forms_assembling')
