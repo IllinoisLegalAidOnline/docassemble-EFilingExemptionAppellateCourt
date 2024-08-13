@@ -188,6 +188,15 @@ fields:
   - code: |
         users[i].name_fields(person_or_business='unsure')
 ---
+sets:
+  - users[0].name.first
+id: user zero name
+question: |
+  What is your name?
+fields:
+  - code: |
+      users[0].name_fields()
+---
 template: long_name_help
 subject: |
   **What if the person's name doesn't fit into 4 fields?**
@@ -595,7 +604,7 @@ under: |
   % endif
 
  
-  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=user_info().question_id, easy_form_variable=user_info().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
+  ${ action_button_html(interview_url(i="docassemble.ILAO:feedback.yml", easy_form_interview=ilao_easy_form_url, easy_form_title=ilao_easy_form_title, easy_form_page=current_context().question_id, easy_form_variable=current_context().variable, local=False,reset=1), label=':comment: Was this program helpful?', color="#181c36", size="md", new_window=True) }
 ---
 code: |
   if trial_party_label == "plaintiff" or trial_party_label == "petitioner":
