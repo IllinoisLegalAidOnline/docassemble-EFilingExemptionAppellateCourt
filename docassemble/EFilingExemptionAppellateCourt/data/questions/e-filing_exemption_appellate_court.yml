@@ -5,7 +5,6 @@ metadata:
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
-  - docassemble.ALToolbox:phone-number-validation.yml
   - docassemble.ILAO:ilao-interview-framework.yml
   - docassemble.ILAO:shared-basic-questions.yml
 ---
@@ -85,6 +84,7 @@ code: |
   set_progress(100)
   nav.set_section('section_download')
   plaintiff_appellant
+  e_signature
   forms_assembling
   snapshot_forms
   get_docs_screen
@@ -131,7 +131,7 @@ subquestion: |
   
   If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court**](https://www.illinoislegalaid.org/legal-information/e-filing-exemption-supreme-court) Easy Form.
   
-  Learn about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
+  To learn more, read ILAO's article about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
 field: sees_nav_bar
 ---
 id: instructions
@@ -149,20 +149,16 @@ subquestion: |
   
   Set aside 5 minutes to finish this program. You can log in and save your work to return to later. 
     
-  After you download your form, you will need to deliver it to the courthouse.
+  After you download your form, you will need to file it at the courthouse.
   
   ${ collapse_template(help_example) }  
 
-  Click on **{green words}** to learn what they mean. Some questions have a question mark in a circle ${ fa_icon("question-circle", color_css="#0DCAF0" ) } that also gives help. 
+  Click on **{green words}** to learn what they mean. Some pages have a question mark in a circle ${ fa_icon("question-circle", color_css="#0dcaf0" ) } that helps explain things. 
 ---
 template: help_example
-
 subject: |
-
-  **You can expand sections like this to show more information.**
-
+  **You can click sections like this to show more information.**
 content: |  
-
   This is an example of help. Click again to hide.
 ---
 id: accept terms
@@ -460,7 +456,7 @@ question: |
 subquestion: |
   The county should be listed near the top of the circuit court papers.
 fields:
-  - no label: trial_court_index
+  - County: trial_court_index
     code: |
       court_county_lookup()
 ---
@@ -620,6 +616,30 @@ code: |
     defendant_appellee = False
     defendant_appellant = False
 ---
+id: e-signature
+question: |
+  Do you want to add your e-signature to your form?
+subquestion: |
+  This program can put “**/s/ ${users[0].name.full(middle='full')}**” where you would sign your name. The court will accept this as your signature.
+
+  If you do not add your **{e-signature}**, you must sign your paper form before you file it.
+
+  <div class="alert alert-info ilao-info" role="alert">
+    <h6 class="alert-heading">What it means to sign your form</h6>
+    <p>By signing the <i>Certification for Exemption from E-filing</i>, you are certifying that:</p>
+    <p><ul>
+      <li>Everything on the forms is true and correct, or you have been informed or you believe it to be true and correct, and</li>
+      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
+    </ul></p>
+  <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
+  </div>
+fields:
+  - "Add e-signature?": e_signature
+    datatype: yesnoradio
+terms:
+  - "e-signature": |
+      An e-signature is an electronic signature. It is a digital version of a signature that has the same effect as a hand-written signature. 
+---
 id: forms assembling
 continue button field: forms_assembling
 question: |
@@ -648,7 +668,7 @@ subquestion: |
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
   
-  **Note:** This program does not send your form. You will need to do this yourself.
+  **Note:** This program **does not file** your form. You will need to do this yourself.
 
   Thank you for using ILAO Easy Forms!
 under: |
@@ -691,7 +711,7 @@ attachment:
     skip undefined: True
     editable: False
     fields:
-      - "court_county": ${ trial_court.address.county.upper() }
+      - "court_county": ${ trial_court.address.county }
       - "plaintiff_list": ${ users.full_names() if trial_party_label == "plaintiff" or trial_party_label == "petitioner" else other_parties.full_names()}
       - "defendant_list": ${list_defendants(users.full_names(), other_parties.full_names(), anyone_opposing, trial_party_label)}
       - "trial_case_number": ${ trial_case_number }
@@ -705,6 +725,7 @@ attachment:
       - "user_name": ${ users[0].name.full(middle="full") }
       - "user_email": ${ users[0].email if include_email_address == True else "" }
       - "user_phone": ${ phone_number_formatted(users[0].phone_number) if include_phone == True else ""}
+      - "user_signature": ${ users[0].name.full(middle="full") if e_signature else '' }        
       - "appellant_plaintiff": ${plaintiff_appellant}
       - "appellee_plaintiff": ${ plaintiff_appellee}
       - "appellant_defendant": ${ defendant_appellant}
@@ -763,7 +784,7 @@ review:
       - recompute:
         - trial_court
     button: |
-      **Which county was the circuit court case in?:** ${ trial_court.address.county }
+      **Which county was the circuit court case in?** ${ trial_court.address.county }
   - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name.full(middle='full')}
@@ -840,6 +861,10 @@ review:
     button: |
       **Your email:** ${ users[0].email }
     show if: include_email_address
+  - Edit: e_signature
+    button: |
+      **Do you want to add your e-signature to your forms?**
+      ${ word(yesno(e_signature)) }
 ---
 id: user parties review screen
 continue button field: users.revisit
@@ -964,7 +989,7 @@ review:
       - recompute:
         - trial_court
     button: |
-      **Which county was the circuit court case in?:** ${ trial_court.address.county }
+      **Which county was the circuit court case in?** ${ trial_court.address.county }
   - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name.full(middle='full')}
@@ -1030,3 +1055,7 @@ review:
     button: |
       **Your email:** ${ users[0].email }
     show if: include_email_address
+  - Edit: e_signature
+    button: |
+      **Do you want to add your e-signature to your forms?**
+      ${ word(yesno(e_signature)) }
