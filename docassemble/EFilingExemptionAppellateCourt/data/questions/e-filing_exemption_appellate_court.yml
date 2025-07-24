@@ -404,7 +404,7 @@ question: |
   Is anyone else on your side of the circuit court case?
 subquestion: |
   % if len(users.elements) > 1:  
-  So far you have told us about ${comma_and_list(users.complete_elements().full_names())}.
+  So far you have told us about ${users.full_names()}.
   % endif  
 fields:
   - "Anyone else?": users.there_is_another
@@ -444,7 +444,7 @@ id: any more other parties
 question: |
   Are there any other ${ opposing_label }s in the circuit court case?
 subquestion: |  
-  So far you have told us about ${comma_and_list(other_parties.complete_elements().full_names())}.
+  So far you have told us about ${other_parties.full_names()}.
 fields:
   - "Anyone else?": other_parties.there_is_another
     datatype: yesnoradio
@@ -529,8 +529,8 @@ subquestion: |
   ${ collapse_template(appeal_who) }  
 field: user_is_appealing
 choices:
-  - "My party ( ${comma_and_list(users)})": True
-  - "The other party (${comma_and_list(other_parties)})": False
+  - "My party ( ${users.full_names()})": True
+  - "The other party (${other_parties.full_names()})": False
 ---
 id: appellate district
 question: |
@@ -620,7 +620,7 @@ id: e-signature
 question: |
   Do you want to add your e-signature to your form?
 subquestion: |
-  This program can put “**/s/ ${users[0].name.full(middle='full')}**” where you would sign your name. The court will accept this as your signature.
+  This program can put “**/s/ ${users[0].name_full()}**” where you would sign your name. The court will accept this as your signature.
 
   If you do not add your **{e-signature}**, you must sign your paper form before you file it.
 
@@ -722,15 +722,15 @@ attachment:
       - "unable_to": ${ other_reasons.all_true('unable_to') }
       - "user_address_one": ${ users[0].address.line_one(bare=True) }
       - "user_address_two": ${ users[0].address.line_two() }
-      - "user_name": ${ users[0].name.full(middle="full") }
+      - "user_name": ${ users[0].name_full() }
       - "user_email": ${ users[0].email if include_email_address == True else "" }
       - "user_phone": ${ phone_number_formatted(users[0].phone_number) if include_phone == True else ""}
-      - "user_signature": ${ users[0].name.full(middle="full") if e_signature else '' }        
+      - "user_signature": ${ users[0].name_full() if e_signature else '' }        
       - "appellant_plaintiff": ${plaintiff_appellant}
       - "appellee_plaintiff": ${ plaintiff_appellee}
       - "appellant_defendant": ${ defendant_appellant}
       - "appellee_defendant": ${ defendant_appellee}
-      - "judge_name": ${judge.name.full(middle='full')}
+      - "judge_name": ${judge.name_full()}
       - "in_re": ${ in_re_label if in_re_check == True else ""}
       - "minor_involved": ${minor_involved}
       - "appellate_district": ${appellate_district}
@@ -761,7 +761,7 @@ review:
       **Your party:**
 
       % for my_var in users:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
   - Edit: anyone_opposing
     button: |
@@ -773,7 +773,7 @@ review:
       **The other party:**
 
       % for my_var in other_parties:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
     show if: anyone_opposing
   - Edit: trial_case_number
@@ -787,7 +787,7 @@ review:
       **Which county was the circuit court case in?** ${ trial_court.address.county }
   - Edit: judge.name.last
     button: |
-      **Circuit court judge:** ${ judge.name.full(middle='full')}
+      **Circuit court judge:** ${ judge.name_full()}
   - Edit: in_re_check
     button: |
       **Does circuit court case's caption say "In re:?"**  
@@ -883,7 +883,7 @@ table: users.table
 rows: users
 columns:
   - Name: |
-      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+      row_item.name_full() if defined("row_item.name.first") else ""
 edit:
   - name.first
 delete buttons: True
@@ -906,7 +906,7 @@ table: other_parties.table
 rows: other_parties
 columns:
   - Name: |
-      row_item.name.full(middle="full") if defined("row_item.name.first") else ""
+      row_item.name_full() if defined("row_item.name.first") else ""
 edit:
   - name.first
 delete buttons: True
@@ -966,7 +966,7 @@ review:
       **Your party:**
 
       % for my_var in users:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
   - Edit: anyone_opposing
     button: |
@@ -978,7 +978,7 @@ review:
       **The other party:**
 
       % for my_var in other_parties:
-        * ${ my_var.name.full(middle="full") }
+        * ${ my_var.name_full() }
       % endfor
     show if: anyone_opposing
   - Edit: trial_case_number
@@ -992,7 +992,7 @@ review:
       **Which county was the circuit court case in?** ${ trial_court.address.county }
   - Edit: judge.name.last
     button: |
-      **Circuit court judge:** ${ judge.name.full(middle='full')}
+      **Circuit court judge:** ${ judge.name_full()}
   - Edit: in_re_check
     button: |
       **Does circuit court case's caption say "In re:?"**  
@@ -1034,7 +1034,7 @@ subquestion: |
 review:
   - Edit: users[0].name.first
     button: |
-      **Your name:** ${ users[0].name.full(middle='full') }
+      **Your name:** ${ users[0].name_full() }
   - Edit: users[0].address.address
     button: |
       **Your address:**
