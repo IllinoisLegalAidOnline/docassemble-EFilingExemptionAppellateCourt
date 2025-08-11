@@ -47,7 +47,7 @@ code: |
     exemptions_exit
   if sensitive_case == False:
     if have_lawyer == True:
-      do_not_qualify
+      lawyer_help
     else:
       if other_reasons.all_false() == True: 
         do_not_qualify
@@ -161,46 +161,18 @@ subject: |
 content: |  
   This is an example of help. Click again to hide.
 ---
-id: accept terms
-question: |
-  Terms of use
-subquestion: |
-  This program does not provide legal advice. It does not take the place of advice from a lawyer.
-
-  Using this program does not create an attorney-client relationship between you and Illinois Legal Aid Online or its employees.
-
-  ${ collapse_template(get_legal_help) }  
-
-fields:
-  - To continue, you must accept the [**terms of use**](https://www.illinoislegalaid.org/about/terms-of-use).: accept
-    datatype: checkboxes
-    none of the above: False
-    minlength: 1
-    choices:
-      - I accept the terms of use.
-    validation messages:
-      minlength: |
-        You cannot continue unless you agree to the terms of use.
-continue button field: accept_terms
----
-template: get_legal_help
-subject: |
-  **What if I need legal advice?**
-content: |  
-  If you have questions or concerns about your legal problem and want legal advice you should talk to a lawyer.
- 
-  Use [**Get Legal Help**](https://www.illinoislegalaid.org/get-legal-help) to find free or low-cost legal services in your area.
----
 id: qualifications
 continue button field: how_to_qualify
 question: |
   Qualifying for an e-filing exemption
 subquestion: |
-  You may qualify for an e-filing exemption if you are filing court forms in a sensitive case, such as a petition for an Order of Protection, a Civil No Contact Order, or a Stalking No Contact Order.
+  You may qualify for an e-filing exemption if you are filing court forms in an emergency case, such as a petition for an Order of Protection, a Civil No Contact Order, or a Stalking No Contact Order. Other emergency cases may be exempt from e-filing by local rule or order.
 
   You may also qualify if you do not have a lawyer and at least one of the following statements is true:
 
-  * You do not have the Internet or computer access in the home and travel presents a hardship (financial or otherwise),
+  * You do not have the Internet or computer access in your home,
+  * You do not have an email account,
+  * You do not have a credit card, debit card, or bank account,
   * You have trouble reading, writing, or speaking in English, or
   * You tried to e-file your papers, but you were not able to complete the process because the equipment or help you need was not available.
 ---
@@ -336,9 +308,13 @@ buttons:
 ---
 id: sensitive case
 question: |
-  Are you going to file forms into a sensitive case?
+  Are you filing forms into an emergency case?
 subquestion: |
-   For example, a petition for an Order of Protection, a Civil No Contact Order, or a Stalking No Contact Order are all sensitive cases.
+   For example, a petition for an Order of Protection, a Civil No Contact Order, or Stalking No Contact Order are all emergency cases.
+
+   Other emergency cases may be exempt from e-filing by local rule or order.
+
+   **Note:** This is **not** asking if this is an appeal under rule 311(a). We will ask if the case involves parental responsibility or parenting time (formerly "custody" or "visitation"), or relocation of a child on another screen. Those kinds of cases involving minor children can qualify for expedited appellate review, but they are not automatically exempt from e-filing.
 fields:
   - no label: sensitive_case
     datatype: yesnoradio
@@ -349,6 +325,18 @@ question: |
 fields:
   - no label: have_lawyer
     datatype: yesnoradio
+---
+id: lawyer can request exemption
+event: lawyer_help
+question: |
+  Sorry
+subquestion: |
+  This program is made for people without lawyers. You can ask your lawyer about getting an e-filing exemption.
+  
+  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory) or you can call or text [**Illinois Court Help**](https://www.ilcourthelp.gov) at 833-411-1121.
+buttons:
+  - Exit: exit
+  - Restart: restart
 ---
 id: do not qualify
 event: do_not_qualify
@@ -371,7 +359,9 @@ fields:
   - no label: other_reasons
     datatype: checkboxes
     choices:
-      - "I do not have a computer or Internet access in my home. My only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.": no_computer
+      - "I do not have the Internet or computer access in the home.": no_computer
+      - "I do not have an email account.": no_email
+      - "I do not have a credit card, debit card, or bank account.": no_bank
       - "I have trouble reading, writing, or speaking in English.": no_english
       - "I tried to e-file my papers, but I was unable to complete the process because the equipment or help I need is not available.": unable_to
 ---
@@ -511,7 +501,7 @@ id: in re check
 question: |
  Does the circuit court case have the words "**In re:**" in the name?
 subquestion: |
-  Look at the name of the case at the top of the circuit court papers. “In re” is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In re: Estate of Jane Doe.”
+  Look at the name of the case at the top of the circuit court papers. "In re" is often used in probate, bankruptcy, and some family law cases. For example, a probate case regarding Jane Doe’s estate might be called “In re: Estate of Jane Doe.”
 fields:
   - no label: in_re_check
     datatype: yesnoradio
@@ -628,8 +618,8 @@ subquestion: |
     <h6 class="alert-heading">What it means to sign your form</h6>
     <p>By signing the <i>Certification for Exemption from E-filing</i>, you are certifying that:</p>
     <p><ul>
-      <li>Everything on the forms is true and correct, or you have been informed or you believe it to be true and correct, and</li>
-      <li>You understand that making a false statement on the form is perjury, which can result in criminal penalties.</li>
+      <li>Everything on the form is true and correct, or you have been informed or you believe it to be true and correct, and</li>
+      <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
     </ul></p>
   <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
@@ -656,7 +646,7 @@ event: get_docs_screen
 question: |
   Download
 subquestion: |
-  Your form is ready. View and download your form below. Click **Make changes** to fix any mistakes.
+  Your form is ready. View and download your form below. Click **:edit: Make changes** to fix any mistakes.
   
   Read the instructions to learn what to do next.
   
@@ -716,12 +706,10 @@ attachment:
       - "defendant_list": ${list_defendants(users.full_names(), other_parties.full_names(), anyone_opposing, trial_party_label)}
       - "trial_case_number": ${ trial_case_number }
       - "appellate_case_number": ${ appellate_case_number }
-      - "no_computer": ${ other_reasons.all_true('no_computer') }
-      - "no_english": ${ other_reasons.all_true('no_english') }
+      - "unable_to_efile": ${ other_reasons.any_true() }
+      - "form_for_self": ${ True }
       - "sensitive_case": ${ sensitive_case }
-      - "unable_to": ${ other_reasons.all_true('unable_to') }
-      - "user_address_one": ${ users[0].address.line_one(bare=True) }
-      - "user_address_two": ${ users[0].address.line_two() }
+      - "user_address_one_line": ${ users[0].address.on_one_line(bare=True) }
       - "user_name": ${ users[0].name_full() }
       - "user_email": ${ users[0].email if include_email_address == True else "" }
       - "user_phone": ${ phone_number_formatted(users[0].phone_number) if include_phone == True else ""}
@@ -802,7 +790,7 @@ review:
       ${word(yesno(minor_involved))}
   - Edit: sensitive_case
     button: |
-      **Is this a sensitive case?**
+      **Is this an emergency case?**
       ${ word(yesno(sensitive_case)) }
   - Edit: have_lawyer
     button: |
@@ -815,7 +803,15 @@ review:
         **You are applying for an e-filing exemption because:**
         
       % if other_reasons.all_true('no_computer') == True:
-        * You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.
+        * You do not have a computer or Internet access in you home.
+        
+      % endif
+      % if other_reasons.all_true('no_email') == True:
+        * You do not have an email account.
+        
+      % endif
+      % if other_reasons.all_true('no_bank') == True:
+        * You do not have a credit card, debit card, or bank account.
         
       % endif
       % if other_reasons.all_true('no_english') == True:
@@ -921,7 +917,7 @@ subquestion: |
 review:
   - Edit: sensitive_case
     button: |
-      **Is this a sensitive case?**
+      **Is this an emergency case?**
       ${ word(yesno(sensitive_case)) }
   - Edit: have_lawyer
     button: |
@@ -934,7 +930,15 @@ review:
         **You are applying for an e-filing exemption because:**
         
       % if other_reasons.all_true('no_computer') == True:
-        * You do not have a computer or Internet access in you home. Your only access is through a public terminal at a courthouse, library, or other location. This poses a financial or other hardship.
+        * You do not have a computer or Internet access in you home.
+        
+      % endif
+      % if other_reasons.all_true('no_email') == True:
+        * You do not have an email account.
+        
+      % endif
+      % if other_reasons.all_true('no_bank') == True:
+        * You do not have a credit card, debit card, or bank account.
         
       % endif
       % if other_reasons.all_true('no_english') == True:
