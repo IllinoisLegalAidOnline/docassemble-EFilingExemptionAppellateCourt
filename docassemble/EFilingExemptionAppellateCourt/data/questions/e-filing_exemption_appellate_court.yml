@@ -204,7 +204,7 @@ fields:
 ---
 template: long_name_help
 subject: |
-  **What if the person's name doesn't fit into 4 fields?**
+  **What if I need more space?**
 content: |
   If the party has a long name like "Jane Smith, Director of Housing," select **Business or organization**. You can then enter the full name and title.
 ---
@@ -314,7 +314,7 @@ subquestion: |
 
    Other emergency cases may be exempt from e-filing by local rule or order.
 
-   **Note:** This is **not** asking if this is an appeal under rule 311(a). We will ask if the case involves parental responsibility or parenting time (formerly "custody" or "visitation"), or relocation of a child on another screen. Those kinds of cases involving minor children can qualify for expedited appellate review, but they are not automatically exempt from e-filing.
+   **Note:** This question is **not** asking if this is an appeal under rule 311(a). We will ask if the case involves parental responsibility or parenting time (formerly "custody" or "visitation"), or relocation of a child on another screen. Those kinds of cases involving minor children can qualify for expedited review, but they are not automatically exempt from e-filing.
 fields:
   - no label: sensitive_case
     datatype: yesnoradio
