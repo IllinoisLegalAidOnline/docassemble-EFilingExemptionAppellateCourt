@@ -394,7 +394,7 @@ question: |
   Is anyone else on your side of the circuit court case?
 subquestion: |
   % if len(users.elements) > 1:  
-  So far you have told us about ${users.full_names()}.
+  So far you have told us about ${ fix_punctuation( users.full_names() ) }
   % endif  
 fields:
   - "Anyone else?": users.there_is_another
@@ -434,7 +434,7 @@ id: any more other parties
 question: |
   Are there any other ${ opposing_label }s in the circuit court case?
 subquestion: |  
-  So far you have told us about ${other_parties.full_names()}.
+  So far you have told us about ${fix_punctuation( other_parties.full_names())}
 fields:
   - "Anyone else?": other_parties.there_is_another
     datatype: yesnoradio
@@ -610,7 +610,7 @@ id: e-signature
 question: |
   Do you want to add your e-signature to your form?
 subquestion: |
-  This program can put “**/s/ ${users[0].name_full()}**” where you would sign your name. The court will accept this as your signature.
+  This program can put "**/s/ ${users[0].name_full()}**" where you would sign your name. The court will accept this as your signature.
 
   If you do not add your **{e-signature}**, you must sign your paper form before you file it.
 
@@ -621,7 +621,7 @@ subquestion: |
       <li>Everything on the form is true and correct, or you have been informed or you believe it to be true and correct, and</li>
       <li>You understand that making a false statement on the form is perjury and has penalties provided by law.</li>
     </ul></p>
-  <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
+  <p>See the <a href="https://www.ilga.gov/legislation/ilcs/documents/073500050k1-109.htm"><b>Illinois Code of Civil Procedure, 735 ILCS 5/1-109</b></a> for more information.</p>
   </div>
 fields:
   - "Add e-signature?": e_signature
