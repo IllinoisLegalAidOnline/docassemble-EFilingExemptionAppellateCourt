@@ -690,8 +690,8 @@ content: |
   [**Illinois Legal Aid Online**](https://www.illinoislegalaid.org)
 ---
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
-  - al_court_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="Download all forms", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="All forms", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[instructions, efiling_exemption], filename="efiling_exemption_appellate_court.pdf", title="All forms", enabled=True)
 ---
 attachment:
   - name: E-filing exemption
@@ -706,6 +706,7 @@ attachment:
       - "defendant_list": ${list_defendants(users.full_names(), other_parties.full_names(), anyone_opposing, trial_party_label)}
       - "trial_case_number": ${ trial_case_number }
       - "appellate_case_number": ${ appellate_case_number }
+      - "appellate_case_number_2": ${ appellate_case_number }
       - "unable_to_efile": ${ other_reasons.any_true() }
       - "form_for_self": ${ True }
       - "sensitive_case": ${ sensitive_case }
