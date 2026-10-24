@@ -12,7 +12,6 @@ objects:
   - users: ALPeopleList.using(there_are_any=True)
   - judge: ALIndividual
   - other_parties: ALPeopleList.using(there_are_any=True)
-  - court_list: ALCourtLoader.using(file_name='docassemble.ILAO:data/sources/il_courts.xlsx')
 ---
 code: |
   ilao_easy_form_title = "E-filing exemption - Appellate Court"
@@ -63,7 +62,7 @@ code: |
       other_parties.gather()
   else:
     other_parties.gather()
-  trial_court
+  filing_county
   trial_case_number
   judge.name.last
   if in_re_check == True:
@@ -129,9 +128,9 @@ subquestion: |
 
   This program helps you certify that you have a good reason to receive an e-filing exemption so you can file paper forms in the appellate court.
   
-  If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court**](https://www.illinoislegalaid.org/legal-information/e-filing-exemption-supreme-court) Easy Form.
+  If you need an e-filing exemption for a case in the Illinois Supreme Court, use the [**E-filing exemption - Supreme Court Easy Form**](https://www.illinoislegalaid.org/node/113241).
   
-  To learn more, read ILAO's article about [**e-filing**](https://www.illinoislegalaid.org/legal-information/e-filing-basics).
+  To learn more, see ILAO's article about [**e-filing**](https://www.illinoislegalaid.org/node/109496).
 field: sees_nav_bar
 ---
 id: instructions
@@ -333,7 +332,11 @@ question: |
 subquestion: |
   This program is made for people without lawyers. You can ask your lawyer about getting an e-filing exemption.
   
-  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory) or you can call or text [**Illinois Court Help**](https://www.ilcourthelp.gov) at 833-411-1121.
+  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory) or you can contact Illinois Court Help:
+
+  * **[Visit the Illinois Court Help website :external-link:](https://www.ilcourthelp.gov/)**,
+  * <a href="tel:+18334111121">**Call (833) 411-1121 :phone:**</a>, or
+  * <a href="sms:+18334111121">**Text (833) 411-1121 :comment:**</a>.
 buttons:
   - Exit: exit
   - Restart: restart
@@ -345,7 +348,13 @@ question: |
 subquestion: |
   You do not qualify for an e-filing exemption.
   
-  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory) or you can call or text [**Illinois Court Help**](https://www.ilcourthelp.gov) at 833-411-1121.
+  If you need help e-filing, you can visit a [**Legal Self-Help Center**](https://www.illinoislegalaid.org/get-legal-help/lshc-directory).
+
+   You can also contact Illinois Court Help:
+
+  * **[Visit the Illinois Court Help website :external-link:](https://www.ilcourthelp.gov/)**,
+  * <a href="tel:+18334111121">**Call (833) 411-1121 :phone:**</a>, or
+  * <a href="sms:+18334111121">**Text (833) 411-1121 :comment:**</a>.
 buttons:
   - Exit: exit
   - Restart: restart
@@ -446,26 +455,9 @@ question: |
 subquestion: |
   The county should be listed near the top of the circuit court papers.
 fields:
-  - County: trial_court_index
+  - County: filing_county
     code: |
-      court_county_lookup()
----
-code: |
-  def court_county_lookup():
-    all_court_counties = court_list._load_courts()['address_county'].items()
-    filtered_courts = [(-1, "Cook")]
-    for court in all_court_counties:
-      if court[1] != "Cook":
-        filtered_courts.append(court)
-    return sorted( filtered_courts, key=lambda y: y[1])
----
-depends on:
-  - trial_court_index
-code: |
-  if trial_court_index == "-1":
-    trial_court = court_list.as_court('trial_court', 15)
-  else:
-    trial_court = court_list.as_court('trial_court', trial_court_index)
+      il_county_list
 ---
 template: county_lookup_help
 subject: |
@@ -477,7 +469,7 @@ id: case number
 question: |
   What is the circuit court case number?
 subquestion: |
-  The **{circuit court clerk}** of ${ trial_court.address.county } County gives each case a number when it is filed.
+  The **{circuit court clerk}** of ${ filing_county } County gives each case a number when it is filed.
 
   The case number is in the caption near the top of the first page of the court forms.
 fields:
@@ -701,7 +693,7 @@ attachment:
     skip undefined: True
     editable: False
     fields:
-      - "court_county": ${ trial_court.address.county }
+      - "court_county": ${ filing_county }
       - "plaintiff_list": ${ users.full_names() if trial_party_label == "plaintiff" or trial_party_label == "petitioner" else other_parties.full_names()}
       - "defendant_list": ${list_defendants(users.full_names(), other_parties.full_names(), anyone_opposing, trial_party_label)}
       - "trial_case_number": ${ trial_case_number }
@@ -768,12 +760,10 @@ review:
   - Edit: trial_case_number
     button: |
       **Circuit court case number:** ${ trial_case_number }
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - trial_court
+  - Edit: filing_county
     button: |
-      **Which county was the circuit court case in?** ${ trial_court.address.county }
+      **Which county was the circuit court case in?**
+      ${ filing_county }
   - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name_full()}
@@ -989,12 +979,10 @@ review:
   - Edit: trial_case_number
     button: |
       **Circuit court case number:** ${ trial_case_number }
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - trial_court
+  - Edit: filing_county
     button: |
-      **Which county was the circuit court case in?** ${ trial_court.address.county }
+      **Which county was the circuit court case in?**
+      ${ filing_county }
   - Edit: judge.name.last
     button: |
       **Circuit court judge:** ${ judge.name_full()}
